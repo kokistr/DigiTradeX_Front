@@ -3,7 +3,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "echo \"Skipping tests\" && exit 0",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "serve": "serve -s build -l 8080"
+
   },
   "browserslist": {
     "production": [
@@ -26,6 +28,7 @@
     "react-pdf": "^9.2.1",
     "react-router-dom": "^6.20.1",
     "react-scripts": "5.0.1",
+    "serve": "^14.2.1",
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
