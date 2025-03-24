@@ -38,7 +38,6 @@ const POList = () => {
       
       const response = await axios.get(`${API_URL}/api/po/list`, { 
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Accept': 'application/json'
         }
       });
@@ -97,7 +96,6 @@ const POList = () => {
         { status: newStatus }, 
         {
           headers: {
-            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
         }
@@ -204,7 +202,6 @@ const POList = () => {
         { memo }, 
         {
           headers: {
-            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
         }
@@ -281,7 +278,6 @@ const POList = () => {
       // POを削除
       await axios.delete(`${API_URL}/api/po/delete`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         data: { ids: idsToDelete }
@@ -706,45 +702,45 @@ const POList = () => {
                             </div>
                             <div className="mb-2">
                               <div className="font-bold">船名:</div>
-                              <div>{po.vesselName || ""}</div>
-                            </div>
-                            <div className="mb-2">
-                              <div className="font-bold">Voy No.:</div>
-                              <div>{po.voyageNumber || ""}</div>
-                            </div>
-                            <div className="mb-2">
-                              <div className="font-bold">コンテナ:</div>
-                              <div>{po.containerInfo || ""}</div>
-                            </div>
-                            <div className="mb-2 col-span-4">
-                              <div className="font-bold">メモ:</div>
-                              <div 
-                                contentEditable={true}
-                                onBlur={(e) => handleMemoUpdate(po.id, e.target.textContent)}
-                                className="p-1 border min-h-[40px]"
-                              >
-                                {po.memo || ""}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                    )}
-                  </React.Fragment>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          
-          {/* ページネーション */}
-          {totalPages > 1 && <Pagination />}
-        </div>
-      )}
-      
-      {/* 削除確認モーダル */}
-      <DeleteConfirmModal />
-    </div>
-  );
+                             <div>{po.vesselName || ""}</div>
+                           </div>
+                           <div className="mb-2">
+                             <div className="font-bold">Voy No.:</div>
+                             <div>{po.voyageNumber || ""}</div>
+                           </div>
+                           <div className="mb-2">
+                             <div className="font-bold">コンテナ:</div>
+                             <div>{po.containerInfo || ""}</div>
+                           </div>
+                           <div className="mb-2 col-span-4">
+                             <div className="font-bold">メモ:</div>
+                             <div 
+                               contentEditable={true}
+                               onBlur={(e) => handleMemoUpdate(po.id, e.target.textContent)}
+                               className="p-1 border min-h-[40px]"
+                             >
+                               {po.memo || ""}
+                             </div>
+                           </div>
+                         </div>
+                       </td>
+                     </tr>
+                   )}
+                 </React.Fragment>
+               ))}
+             </tbody>
+           </table>
+         </div>
+         
+         {/* ページネーション */}
+         {totalPages > 1 && <Pagination />}
+       </div>
+     )}
+     
+     {/* 削除確認モーダル */}
+     <DeleteConfirmModal />
+   </div>
+ );
 };
 
 export default POList;
