@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const app = express();
 
-// 静的ファイルの提供
+// 静的ファイル提供
 app.use(express.static(path.join(__dirname, 'build')));
 
 // すべてのリクエストをindex.htmlにリダイレクト（SPA対応）
