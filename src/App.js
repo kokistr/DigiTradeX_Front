@@ -4,30 +4,23 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import POUpload from './pages/POUpload';
 import POList from './pages/POList';
 import Booking from './pages/Booking';
-import Login from './pages/Login';
 import Layout from './components/Layout';
 import './App.css';
 
 function App() {
-  // ユーザー認証状態をチェック
-  const isAuthenticated = () => {
-    const token = localStorage.getItem('token');
-    return !!token; // トークンが存在すればtrue、なければfalse
-  };
+  // 常に認証済みとして扱う（ログイン機能を無効化）
+  const isAuthenticated = () => true;
 
-  // 認証が必要なルートのラッパー
+  // 認証が必要なルートのラッパー（ログインなしで直接アクセス可能に）
   const ProtectedRoute = ({ children }) => {
-    if (!isAuthenticated()) {
-      return <Navigate to="/login" />;
-    }
     return <Layout>{children}</Layout>;
   };
 
   return (
     <Router>
       <Routes>
-        {/* 認証ページ */}
-        <Route path="/login" element={<Login />} />
+        {/* ログインページが削除されたため、/loginへのアクセスをメインページにリダイレクト */}
+        <Route path="/login" element={<Navigate to="/" />} />
         
         {/* メインページ */}
         <Route path="/" element={
