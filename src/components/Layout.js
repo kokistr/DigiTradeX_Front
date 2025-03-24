@@ -6,7 +6,7 @@ const Layout = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // ブッキングページへの遷移
+  // ブッキングページへ遷移
   const navigateToBooking = () => {
     navigate('/booking');
   };
