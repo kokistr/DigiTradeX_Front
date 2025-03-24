@@ -8,7 +8,7 @@ import Layout from './components/Layout';
 import './App.css';
 
 function App() {
-  // 常に認証済みとして扱う（ログイン機能を無効化）
+  // 常に認証済みとして扱う（ログイン機能を無効）
   const isAuthenticated = () => true;
 
   // 認証が必要なルートのラッパー（ログインなしで直接アクセス可能に）
