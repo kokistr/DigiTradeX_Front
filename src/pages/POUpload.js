@@ -99,7 +99,6 @@ const POUpload = () => {
       // local_kwパラメータを追加（APIが期待している）
       formData.append('local_kw', 'true');
       
-      // 認証トークンチェックを削除
       // デバッグログ
       console.log('Uploading file:', file.name);
       console.log('File size:', file.size);
@@ -768,7 +767,7 @@ const POUpload = () => {
                   disabled={viewMode === 'processing'}
                 />
               </div>
-              
+             
               <div className="product-info-section">
                 <div className="product-header">
                   <span>製品情報</span>
@@ -780,7 +779,7 @@ const POUpload = () => {
                     <span>+</span> 製品を追加
                   </button>
                 </div>
-                
+               
                 {poData.products.map((product, index) => (
                   <div key={index} className="product-item">
                     <div className="product-number-row">
@@ -838,7 +837,7 @@ const POUpload = () => {
                  </div>
                ))}
              </div>
-             
+            
              <div className="info-row total-row">
                <div className="info-label">合計金額</div>
                <input 
@@ -849,7 +848,7 @@ const POUpload = () => {
                  disabled={viewMode === 'processing'}
                />
              </div>
-             
+            
              <div className="info-row">
                <div className="info-label">支払い条件</div>
                <input 
@@ -882,7 +881,7 @@ const POUpload = () => {
              </div>
            </div>
          </div>
-         
+        
          {/* 右側：PO画像 */}
          <div className="image-panel">
            <div className="image-header">
@@ -916,14 +915,14 @@ const POUpload = () => {
                  />
                </div>
              )}
-             
+            
              {viewMode === 'processing' && (
                <div className="processing-area">
                  <p className="processing-text">画像を解析しています...</p>
                  <div className="spinner"></div>
                </div>
              )}
-             
+            
              {viewMode === 'summary' && uploadedFile && (
                <div className="preview-area">
                  {uploadedFile.type.includes('image') ? (
@@ -973,7 +972,7 @@ const POUpload = () => {
          </div>
        </div>
      )}
-     
+    
      {/* 登録完了ダイアログ - 新規実装 */}
      {showCompletedDialog && (
        <div className="overlay">
@@ -1004,6 +1003,6 @@ const POUpload = () => {
      )}
    </div>
  );
-};
+ };
 
-export default POUpload;
+ export default POUpload;
