@@ -99,35 +99,23 @@ const POUpload = () => {
       // local_kwパラメータを追加（APIが期待している）
       formData.append('local_kw', 'true');
       
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('認証トークンが見つかりません。再ログインしてください。');
-      }
-      
+      // 認証トークンチェックを削除
       // デバッグログ
-      console.log('Token value for debugging:', token);
-      console.log('Token format check:', token.substring(0, 10));
       console.log('Uploading file:', file.name);
       console.log('File size:', file.size);
       console.log('File type:', file.type);
       
-      // リクエストの前にヘッダーの内容を確認
-      const authHeader = `Bearer ${token}`;
-      console.log('Authorization header being sent:', authHeader);
-      
       // APIエンドポイントの設定
       const url = `${API_URL}/api/ocr/upload`;
       
-      // デバッグ用：認証情報とリクエスト詳細のログ
+      // デバッグ用：リクエスト詳細のログ
       console.log('Request URL:', url);
-      console.log('Authorization Header:', `Bearer ${token.substring(0, 10)}...`);
       console.log('FormData has file:', formData.has('file'));
       console.log('FormData has local_kw:', formData.has('local_kw'));
       
-      // ヘッダーとパラメーターの設定を修正
+      // ヘッダーとパラメーターの設定を修正 - 認証ヘッダーを削除
       const response = await axios.post(url, formData, {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Accept': 'application/json'
         },
         // クエリパラメータの追加
@@ -267,16 +255,10 @@ const POUpload = () => {
   // OCRステータスのチェック
   const checkOCRStatus = async (ocrId) => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('認証トークンが見つかりません。再ログインしてください。');
-      }
-      
       console.log('Checking OCR status for ID:', ocrId);
       
       const response = await axios.get(`${API_URL}/api/ocr/status/${ocrId}`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Accept': 'application/json'
         }
       });
@@ -331,16 +313,10 @@ const POUpload = () => {
   // OCR結果データの取得
   const fetchOCRData = async (ocrId) => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('認証トークンが見つかりません。再ログインしてください。');
-      }
-      
       console.log('Fetching OCR data for ID:', ocrId);
       
       const response = await axios.get(`${API_URL}/api/ocr/extract/${ocrId}`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Accept': 'application/json'
         }
       });
@@ -610,11 +586,6 @@ const POUpload = () => {
     setShowConfirmDialog(false);
     
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('認証トークンが見つかりません。再ログインしてください。');
-      }
-      
       // バックエンドに送信するデータを準備
       // APIの期待する形式にデータを変換
       const requestData = {
@@ -652,7 +623,6 @@ const POUpload = () => {
       
       const response = await axios.post(`${API_URL}/api/po/register`, requestData, {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
@@ -816,224 +786,224 @@ const POUpload = () => {
                     <div className="product-number-row">
                       <span className="product-number">製品 {index + 1}</span>
                       {poData.products.length > 1 && (
-                        <button 
-                          className="remove-product-button"
-                          onClick={() => handleRemoveProduct(index)}
-                          disabled={viewMode === 'processing'}
-                        >
-                          削除
-                        </button>
-                      )}
-                    </div>
-                    <div className="info-row">
-                      <div className="info-label">製品名称</div>
-                      <input 
-                        type="text" 
-                        className="info-input" 
-                        value={product.product_name}
-                        onChange={(e) => handleProductChange(index, 'product_name', e.target.value)}
-                        disabled={viewMode === 'processing'}
-                      />
-                    </div>
-                    <div className="info-row">
-                      <div className="info-label">数量(KG)</div>
-                      <input 
-                        type="text" 
-                        className="info-input" 
-                        value={product.quantity}
-                        onChange={(e) => handleProductChange(index, 'quantity', e.target.value)}
-                        disabled={viewMode === 'processing'}
-                      />
-                    </div>
-                    <div className="info-row">
-                      <div className="info-label">単価</div>
-                      <input 
-                        type="text" 
-                        className="info-input" 
-                        value={product.unit_price}
-                        onChange={(e) => handleProductChange(index, 'unit_price', e.target.value)}
-                        disabled={viewMode === 'processing'}
-                      />
-                    </div>
-                    <div className="info-row">
-                      <div className="info-label">金額</div>
-                      <input 
-                        type="text" 
-                        className="info-input" 
-                        value={product.amount}
-                        onChange={(e) => handleProductChange(index, 'amount', e.target.value)}
-                        disabled={viewMode === 'processing'}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-              
-              <div className="info-row total-row">
-                <div className="info-label">合計金額</div>
-                <input 
-                  type="text" 
-                  className="info-input total-amount" 
-                  value={poData.total_amount}
-                  onChange={handleTotalAmountChange}
-                  disabled={viewMode === 'processing'}
-                />
-              </div>
-              
-              <div className="info-row">
-                <div className="info-label">支払い条件</div>
-                <input 
-                  type="text" 
-                  className="info-input" 
-                  value={poData.payment_terms}
-                  onChange={(e) => handleInputChange('payment_terms', e.target.value)}
-                  disabled={viewMode === 'processing'}
-                />
-              </div>
-              <div className="info-row">
-                <div className="info-label">ターム</div>
-                <input 
-                  type="text" 
-                  className="info-input" 
-                  value={poData.shipping_terms}
-                  onChange={(e) => handleInputChange('shipping_terms', e.target.value)}
-                  disabled={viewMode === 'processing'}
-                />
-              </div>
-              <div className="info-row">
-                <div className="info-label">揚げ地</div>
-                <input 
-                  type="text" 
-                  className="info-input" 
-                  value={poData.destination}
-                  onChange={(e) => handleInputChange('destination', e.target.value)}
-                  disabled={viewMode === 'processing'}
-                />
-              </div>
-            </div>
-          </div>
-          
-          {/* 右側：PO画像 */}
-          <div className="image-panel">
-            <div className="image-header">
-              <div className="image-title">PO画像</div>
-            </div>
-            <div className="image-body">
-              {viewMode === 'upload' && (
-                <div 
-                  className="upload-area"
-                  onDrop={handleDrop}
-                  onDragOver={handleDragOver}
-                  onDragEnter={handleDragEnter}
-                  onDragLeave={handleDragLeave}
-                >
-                  <p className="upload-main-text">POをアップロードしてください</p>
-                  <p className="upload-sub-text">(対応形式：PDF/PNG/JPEG)</p>
-                  <p className="upload-instruction">ここにドラッグアンドドロップ</p>
-                  <p className="upload-or">または</p>
-                  <button
-                    className="file-select-button"
-                    onClick={handleFileButtonClick}
-                  >
-                    ファイルを選択
-                  </button>
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    className="file-input-hidden"
-                    accept=".pdf,.png,.jpg,.jpeg"
-                    onChange={handleFileChange}
-                  />
-                </div>
-              )}
-              
-              {viewMode === 'processing' && (
-                <div className="processing-area">
-                  <p className="processing-text">画像を解析しています...</p>
-                  <div className="spinner"></div>
-                </div>
-              )}
-              
-              {viewMode === 'summary' && uploadedFile && (
-                <div className="preview-area">
-                  {uploadedFile.type.includes('image') ? (
-                    <img 
-                      src={URL.createObjectURL(uploadedFile)} 
-                      alt="Uploaded PO" 
-                      className="preview-image"
-                    />
-                  ) : (
-                    <div className="preview-pdf">
-                      <p className="preview-filename">ファイル名: {uploadedFile.name}</p>
-                      <object
-                        data={URL.createObjectURL(uploadedFile)}
-                        type="application/pdf"
-                        className="pdf-object"
-                      >
-                        <p>PDFを表示できません。<a href={URL.createObjectURL(uploadedFile)} target="_blank" rel="noopener noreferrer">ここをクリック</a>して新しいタブで開いてください。</p>
-                      </object>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
+                       <button 
+                         className="remove-product-button"
+                         onClick={() => handleRemoveProduct(index)}
+                         disabled={viewMode === 'processing'}
+                       >
+                         削除
+                       </button>
+                     )}
+                   </div>
+                   <div className="info-row">
+                     <div className="info-label">製品名称</div>
+                     <input 
+                       type="text" 
+                       className="info-input" 
+                       value={product.product_name}
+                       onChange={(e) => handleProductChange(index, 'product_name', e.target.value)}
+                       disabled={viewMode === 'processing'}
+                     />
+                   </div>
+                   <div className="info-row">
+                     <div className="info-label">数量(KG)</div>
+                     <input 
+                       type="text" 
+                       className="info-input" 
+                       value={product.quantity}
+                       onChange={(e) => handleProductChange(index, 'quantity', e.target.value)}
+                       disabled={viewMode === 'processing'}
+                     />
+                   </div>
+                   <div className="info-row">
+                     <div className="info-label">単価</div>
+                     <input 
+                       type="text" 
+                       className="info-input" 
+                       value={product.unit_price}
+                       onChange={(e) => handleProductChange(index, 'unit_price', e.target.value)}
+                       disabled={viewMode === 'processing'}
+                     />
+                   </div>
+                   <div className="info-row">
+                     <div className="info-label">金額</div>
+                     <input 
+                       type="text" 
+                       className="info-input" 
+                       value={product.amount}
+                       onChange={(e) => handleProductChange(index, 'amount', e.target.value)}
+                       disabled={viewMode === 'processing'}
+                     />
+                   </div>
+                 </div>
+               ))}
+             </div>
+             
+             <div className="info-row total-row">
+               <div className="info-label">合計金額</div>
+               <input 
+                 type="text" 
+                 className="info-input total-amount" 
+                 value={poData.total_amount}
+                 onChange={handleTotalAmountChange}
+                 disabled={viewMode === 'processing'}
+               />
+             </div>
+             
+             <div className="info-row">
+               <div className="info-label">支払い条件</div>
+               <input 
+                 type="text" 
+                 className="info-input" 
+                 value={poData.payment_terms}
+                 onChange={(e) => handleInputChange('payment_terms', e.target.value)}
+                 disabled={viewMode === 'processing'}
+               />
+             </div>
+             <div className="info-row">
+               <div className="info-label">ターム</div>
+               <input 
+                 type="text" 
+                 className="info-input" 
+                 value={poData.shipping_terms}
+                 onChange={(e) => handleInputChange('shipping_terms', e.target.value)}
+                 disabled={viewMode === 'processing'}
+               />
+             </div>
+             <div className="info-row">
+               <div className="info-label">揚げ地</div>
+               <input 
+                 type="text" 
+                 className="info-input" 
+                 value={poData.destination}
+                 onChange={(e) => handleInputChange('destination', e.target.value)}
+                 disabled={viewMode === 'processing'}
+               />
+             </div>
+           </div>
+         </div>
+         
+         {/* 右側：PO画像 */}
+         <div className="image-panel">
+           <div className="image-header">
+             <div className="image-title">PO画像</div>
+           </div>
+           <div className="image-body">
+             {viewMode === 'upload' && (
+               <div 
+                 className="upload-area"
+                 onDrop={handleDrop}
+                 onDragOver={handleDragOver}
+                 onDragEnter={handleDragEnter}
+                 onDragLeave={handleDragLeave}
+               >
+                 <p className="upload-main-text">POをアップロードしてください</p>
+                 <p className="upload-sub-text">(対応形式：PDF/PNG/JPEG)</p>
+                 <p className="upload-instruction">ここにドラッグアンドドロップ</p>
+                 <p className="upload-or">または</p>
+                 <button
+                   className="file-select-button"
+                   onClick={handleFileButtonClick}
+                 >
+                   ファイルを選択
+                 </button>
+                 <input
+                   type="file"
+                   ref={fileInputRef}
+                   className="file-input-hidden"
+                   accept=".pdf,.png,.jpg,.jpeg"
+                   onChange={handleFileChange}
+                 />
+               </div>
+             )}
+             
+             {viewMode === 'processing' && (
+               <div className="processing-area">
+                 <p className="processing-text">画像を解析しています...</p>
+                 <div className="spinner"></div>
+               </div>
+             )}
+             
+             {viewMode === 'summary' && uploadedFile && (
+               <div className="preview-area">
+                 {uploadedFile.type.includes('image') ? (
+                   <img 
+                     src={URL.createObjectURL(uploadedFile)} 
+                     alt="Uploaded PO" 
+                     className="preview-image"
+                   />
+                 ) : (
+                   <div className="preview-pdf">
+                     <p className="preview-filename">ファイル名: {uploadedFile.name}</p>
+                     <object
+                       data={URL.createObjectURL(uploadedFile)}
+                       type="application/pdf"
+                       className="pdf-object"
+                     >
+                       <p>PDFを表示できません。<a href={URL.createObjectURL(uploadedFile)} target="_blank" rel="noopener noreferrer">ここをクリック</a>して新しいタブで開いてください。</p>
+                     </object>
+                   </div>
+                 )}
+               </div>
+             )}
+           </div>
+         </div>
+       </div>
+     </div>
 
-      {/* 登録確認ダイアログ - デザイン変更 */}
-      {showConfirmDialog && (
-        <div className="overlay">
-          <div className="dialog">
-            <h3 className="dialog-title">PO情報を登録しますか？</h3>
-            <div className="dialog-buttons">
-              <button 
-                className="dialog-button-cancel"
-                onClick={() => setShowConfirmDialog(false)}
-              >
-                戻る
-              </button>
-              <button 
-                className="dialog-button-confirm"
-                onClick={confirmRegistration}
-              >
-                はい
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      
-      {/* 登録完了ダイアログ - 新規実装 */}
-      {showCompletedDialog && (
-        <div className="overlay">
-          <div className="dialog">
-            <h3 className="dialog-title">PO情報が登録されました</h3>
-            <div className="dialog-buttons">
-              <button 
-                className="dialog-button-cancel"
-                onClick={() => {
-                  setShowCompletedDialog(false);
-                  resetToManualEntry();
-                }}
-              >
-                別のPOを登録する
-              </button>
-              <button 
-                className="dialog-button-confirm"
-                onClick={() => {
-                  setShowCompletedDialog(false);
-                  navigateToList();
-                }}
-              >
-                一覧を見る
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+     {/* 登録確認ダイアログ - デザイン変更 */}
+     {showConfirmDialog && (
+       <div className="overlay">
+         <div className="dialog">
+           <h3 className="dialog-title">PO情報を登録しますか？</h3>
+           <div className="dialog-buttons">
+             <button 
+               className="dialog-button-cancel"
+               onClick={() => setShowConfirmDialog(false)}
+             >
+               戻る
+             </button>
+             <button 
+               className="dialog-button-confirm"
+               onClick={confirmRegistration}
+             >
+               はい
+             </button>
+           </div>
+         </div>
+       </div>
+     )}
+     
+     {/* 登録完了ダイアログ - 新規実装 */}
+     {showCompletedDialog && (
+       <div className="overlay">
+         <div className="dialog">
+           <h3 className="dialog-title">PO情報が登録されました</h3>
+           <div className="dialog-buttons">
+             <button 
+               className="dialog-button-cancel"
+               onClick={() => {
+                 setShowCompletedDialog(false);
+                 resetToManualEntry();
+               }}
+             >
+               別のPOを登録する
+             </button>
+             <button 
+               className="dialog-button-confirm"
+               onClick={() => {
+                 setShowCompletedDialog(false);
+                 navigateToList();
+               }}
+             >
+               一覧を見る
+             </button>
+           </div>
+         </div>
+       </div>
+     )}
+   </div>
+ );
 };
 
 export default POUpload;
