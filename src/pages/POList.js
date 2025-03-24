@@ -16,7 +16,8 @@ const POList = () => {
     status: '',
     customer_name: '',
     po_number: '',
-    manager: ''
+    manager: '',
+    organization: ''
   });
   
   // ページネーション用の状態
@@ -152,7 +153,8 @@ const POList = () => {
       status: '',
       customer_name: '',
       po_number: '',
-      manager: ''
+      manager: '',
+      organization: ''
     });
     setPOList(originalData);
     setCurrentPage(1); // ページを1に戻す
@@ -186,6 +188,12 @@ const POList = () => {
       // 担当者フィルター
       if (filters.manager && 
           !String(po.manager || '').toLowerCase().includes(filters.manager.toLowerCase())) {
+        return false;
+      }
+      
+      // 組織フィルター
+      if (filters.organization && 
+          !String(po.organization || '').toLowerCase().includes(filters.organization.toLowerCase())) {
         return false;
       }
       
@@ -493,6 +501,30 @@ const POList = () => {
           </div>
           
           <div className="flex-1 min-w-[150px]">
+            <label className="block text-sm font-medium text-gray-700 mb-1">担当者:</label>
+            <input
+              type="text"
+              name="manager"
+              value={filters.manager}
+              onChange={handleFilterChange}
+              placeholder="担当者名で検索"
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+          </div>
+
+          <div className="flex-1 min-w-[150px]">
+            <label className="block text-sm font-medium text-gray-700 mb-1">組織:</label>
+            <input
+              type="text"
+              name="organization"
+              value={filters.organization || ''}
+              onChange={handleFilterChange}
+              placeholder="組織で検索"
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+          </div>
+
+          <div className="flex-1 min-w-[150px]">
             <label className="block text-sm font-medium text-gray-700 mb-1">PONo:</label>
             <input
               type="text"
@@ -515,18 +547,6 @@ const POList = () => {
               className="w-full p-2 border border-gray-300 rounded"
             />
           </div>    
-          
-          <div className="flex-1 min-w-[150px]">
-            <label className="block text-sm font-medium text-gray-700 mb-1">担当者:</label>
-            <input
-              type="text"
-              name="manager"
-              value={filters.manager}
-              onChange={handleFilterChange}
-              placeholder="担当者名で検索"
-              className="w-full p-2 border border-gray-300 rounded"
-            />
-          </div>
           
           <button 
             onClick={applyFilters} 
@@ -592,15 +612,14 @@ const POList = () => {
                   </th>
                   <th className="border p-2"></th>
                   <th className="border p-2">出荷手配</th>
+                  <th className="border p-2">担当者</th>
+                  <th className="border p-2">組織</th>
+                  <th className="border p-2">INV No.</th>
                   <th className="border p-2">PO No.</th>
                   <th className="border p-2">顧客</th>
+                  <th className="border p-2">CUT</th>
                   <th className="border p-2">ETD</th>
                   <th className="border p-2">揚げ地</th>
-                  <th className="border p-2">商品名称</th>
-                  <th className="border p-2">数量(kg)</th>
-                  <th className="border p-2">単価</th>
-                  <th className="border p-2">金額</th>
-                  <th className="border p-2">通貨</th>
                 </tr>
               </thead>
               <tbody>
@@ -631,7 +650,6 @@ const POList = () => {
                           value={po.status || '手配前'}
                           onChange={(e) => handleStatusChange(po.id, e.target.value)}
                           className="border rounded p-1 w-full"
-                          disabled={po.status === '計上済'} // 計上済の場合は変更不可
                         >
                           <option value="手配前">手配前</option>
                           <option value="手配中">手配中</option>
@@ -639,83 +657,86 @@ const POList = () => {
                           <option value="計上済">計上済</option>
                         </select>
                       </td>
-                      <td className="border p-2">{po.poNumber || "未"}</td>
-                      <td className="border p-2">{po.customer || "未"}</td>
-                      <td className="border p-2">{po.etd || "未"}</td>
-                      <td className="border p-2">{po.destination || "未"}</td>
-                      <td className="border p-2">{po.productName || "未"}</td>
-                      <td className="border p-2">{po.quantity || "0"}</td>
-                      <td className="border p-2">{po.unitPrice || "0"}</td>
-                      <td className="border p-2">{po.amount || "0"}</td>
-                      <td className="border p-2">{po.currency || "USD"}</td>
+                      <td className="border p-2">{po.manager || ""}</td>
+                      <td className="border p-2">{po.organization || ""}</td>
+                      <td className="border p-2">{po.invoiceNumber || ""}</td>
+                      <td className="border p-2">{po.poNumber || ""}</td>
+                      <td className="border p-2">{po.customer || ""}</td>
+                      <td className="border p-2">{po.cutOffDate || ""}</td>
+                      <td className="border p-2">{po.etd || ""}</td>
+                      <td className="border p-2">{po.destination || ""}</td>
                     </tr>
                     {expandedRows[po.id] && (
                       <tr className={`${getStatusClass(po.status)} text-xs`}>
-                        <td colSpan="12" className="border p-2">
+                        <td colSpan="11" className="border p-2">
                           <div className="grid grid-cols-4 gap-2">
                             <div className="mb-2">
                               <div className="font-bold">取得日:</div>
-                              <div>{po.acquisitionDate || "未"}</div>
-                            </div>
-                            <div className="mb-2">
-                              <div className="font-bold">組織:</div>
-                              <div>{po.organization || "未"}</div>
+                              <div>{po.acquisitionDate || ""}</div>
                             </div>
                             <div className="mb-2">
                               <div className="font-bold">伝票:</div>
-                              <div>{po.invoice || "未"}</div>
+                              <div>{po.invoice || ""}</div>
                             </div>
                             <div className="mb-2">
                               <div className="font-bold">入金:</div>
-                              <div>{po.payment || "未"}</div>
+                              <div>{po.payment || ""}</div>
                             </div>
                             <div className="mb-2">
                               <div className="font-bold">BKG:</div>
-                              <div>{po.booking || "未"}</div>
+                              <div>{po.booking || ""}</div>
                             </div>
                             <div className="mb-2">
-                              <div className="font-bold">担当者:</div>
-                              <div>{po.manager || "未"}</div>
+                              <div className="font-bold">商品名称:</div>
+                              <div>{po.productName || ""}</div>
                             </div>
                             <div className="mb-2">
-                              <div className="font-bold">INV No.:</div>
-                              <div>{po.invoiceNumber || "未"}</div>
+                              <div className="font-bold">数量(kg):</div>
+                              <div>{po.quantity || ""}</div>
+                            </div>
+                            <div className="mb-2">
+                              <div className="font-bold">単価:</div>
+                              <div>{po.unitPrice || ""}</div>
+                            </div>
+                            <div className="mb-2">
+                              <div className="font-bold">金額:</div>
+                              <div>{po.amount || ""}</div>
+                            </div>
+                            <div className="mb-2">
+                              <div className="font-bold">通貨:</div>
+                              <div>{po.currency || ""}</div>
                             </div>
                             <div className="mb-2">
                               <div className="font-bold">支払条件:</div>
-                              <div>{po.paymentTerms || "未"}</div>
+                              <div>{po.paymentTerms || ""}</div>
                             </div>
                             <div className="mb-2">
                               <div className="font-bold">ターム:</div>
-                              <div>{po.terms || "未"}</div>
+                              <div>{po.terms || ""}</div>
                             </div>
                             <div className="mb-2">
                               <div className="font-bold">経由地:</div>
-                              <div>{po.transitPoint || "未"}</div>
-                            </div>
-                            <div className="mb-2">
-                              <div className="font-bold">CUT:</div>
-                              <div>{po.cutOffDate || "未"}</div>
+                              <div>{po.transitPoint || ""}</div>
                             </div>
                             <div className="mb-2">
                               <div className="font-bold">ETA:</div>
-                              <div>{po.eta || "未"}</div>
+                              <div>{po.eta || ""}</div>
                             </div>
                             <div className="mb-2">
                               <div className="font-bold">BKG No.:</div>
-                              <div>{po.bookingNumber || "未"}</div>
+                              <div>{po.bookingNumber || ""}</div>
                             </div>
                             <div className="mb-2">
                               <div className="font-bold">船名:</div>
-                              <div>{po.vesselName || "未"}</div>
+                              <div>{po.vesselName || ""}</div>
                             </div>
                             <div className="mb-2">
                               <div className="font-bold">Voy No.:</div>
-                              <div>{po.voyageNumber || "未"}</div>
+                              <div>{po.voyageNumber || ""}</div>
                             </div>
                             <div className="mb-2">
                               <div className="font-bold">コンテナ:</div>
-                              <div>{po.containerInfo || "未"}</div>
+                              <div>{po.containerInfo || ""}</div>
                             </div>
                             <div className="mb-2 col-span-4">
                               <div className="font-bold">メモ:</div>
