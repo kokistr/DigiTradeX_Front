@@ -34,12 +34,6 @@ const POList = () => {
     try {
       setIsLoading(true);
       
-      // 認証トークンの取得
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('認証トークンが見つかりません。再ログインしてください。');
-      }
-      
       console.log('PO一覧データ取得開始');
       
       const response = await axios.get(`${API_URL}/api/po/list`, { 
@@ -95,11 +89,6 @@ const POList = () => {
   // 出荷手配変更ハンドラ
   const handleStatusChange = async (id, newStatus) => {
     try {
-      // 認証トークンの取得
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('認証トークンが見つかりません。再ログインしてください。');
-      }
       
       console.log(`出荷手配更新: ID=${id}, 新出荷手配=${newStatus}`);
       
@@ -209,11 +198,6 @@ const POList = () => {
   // メモ更新ハンドラ
   const handleMemoUpdate = async (id, memo) => {
     try {
-      // 認証トークンの取得
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('認証トークンが見つかりません。再ログインしてください。');
-      }
       
       await axios.patch(
         `${API_URL}/api/po/${id}/memo`, 
@@ -286,12 +270,6 @@ const POList = () => {
   const deleteSelectedItems = async () => {
     try {
       setIsDeleting(true);
-      
-      // 認証トークンの取得
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('認証トークンが見つかりません。再ログインしてください。');
-      }
       
       // 選択されたIDのリストを作成
       const idsToDelete = Object.entries(selectedItems)
