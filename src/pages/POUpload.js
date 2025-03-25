@@ -16,7 +16,7 @@ const POUpload = () => {
     // PurchaseOrdersテーブルのフィールド
     customer_name: '',
     po_number: '',
-    currency: 'USD',  // デフォルト値を設定
+    currency: '',  
     total_amount: '0.00',
     payment_terms: '',
     shipping_terms: '',
@@ -117,7 +117,7 @@ const POUpload = () => {
           'Content-Type': 'multipart/form-data'  // Content-Type を明示的に指定
         },
         // タイムアウト設定を長く
-        timeout: 60000, // 60秒に延長
+        timeout: 120000, // 120秒に延長
         withCredentials: false
       });
       
