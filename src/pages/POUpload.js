@@ -96,33 +96,28 @@ const POUpload = () => {
       const formData = new FormData();
       formData.append('file', file);
       
-      // local_kwパラメータを追加（APIが期待している）
+      // local_kwパラメータを追加（FormDataに直接追加）
       formData.append('local_kw', 'true');
       
-      // デバッグログ
+      // デバッグログの拡張
+      console.log('API_URL:', API_URL);
       console.log('Uploading file:', file.name);
       console.log('File size:', file.size);
       console.log('File type:', file.type);
+      console.log('Full upload URL:', `${API_URL}/api/ocr/upload`);
       
-      // APIエンドポイントの設定
-      const url = `${API_URL}/api/ocr/upload`;
-      
-      // デバッグ用：リクエスト詳細のログ
-      console.log('Request URL:', url);
+      // FormDataの内容を確認
       console.log('FormData has file:', formData.has('file'));
       console.log('FormData has local_kw:', formData.has('local_kw'));
       
-      // ヘッダーとパラメーターの設定を修正 - 認証ヘッダーを削除
-      const response = await axios.post(url, formData, {
+      // ヘッダーとパラメータの設定を修正
+      const response = await axios.post(`${API_URL}/api/ocr/upload`, formData, {
         headers: {
-          'Accept': 'application/json'
+          'Accept': 'application/json',
+          'Content-Type': 'multipart/form-data'  // Content-Type を明示的に指定
         },
-        // クエリパラメータの追加
-        params: {
-          local_kw: 'true'
-        },
-        // タイムアウト設定
-        timeout: 30000, // 30秒
+        // タイムアウト設定を長く
+        timeout: 60000, // 60秒に延長
         withCredentials: false
       });
       
@@ -837,7 +832,7 @@ const POUpload = () => {
                  </div>
                ))}
              </div>
-            
+           
              <div className="info-row total-row">
                <div className="info-label">合計金額</div>
                <input 
@@ -848,7 +843,7 @@ const POUpload = () => {
                  disabled={viewMode === 'processing'}
                />
              </div>
-            
+           
              <div className="info-row">
                <div className="info-label">支払い条件</div>
                <input 
@@ -881,7 +876,7 @@ const POUpload = () => {
              </div>
            </div>
          </div>
-        
+       
          {/* 右側：PO画像 */}
          <div className="image-panel">
            <div className="image-header">
@@ -915,14 +910,14 @@ const POUpload = () => {
                  />
                </div>
              )}
-            
+           
              {viewMode === 'processing' && (
                <div className="processing-area">
                  <p className="processing-text">画像を解析しています...</p>
                  <div className="spinner"></div>
                </div>
              )}
-            
+           
              {viewMode === 'summary' && uploadedFile && (
                <div className="preview-area">
                  {uploadedFile.type.includes('image') ? (
@@ -972,7 +967,7 @@ const POUpload = () => {
          </div>
        </div>
      )}
-    
+   
      {/* 登録完了ダイアログ - 新規実装 */}
      {showCompletedDialog && (
        <div className="overlay">
