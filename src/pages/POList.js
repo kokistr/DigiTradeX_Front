@@ -73,7 +73,7 @@ const POList = () => {
   const getStatusClass = (status) => {
     switch (status) {
       case '手配前':
-        return ''; // デフォルト色
+        return 'bg-white-100'; // デフォルト色
       case '手配中':
         return 'bg-red-100';
       case '手配済':
