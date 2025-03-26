@@ -592,21 +592,21 @@ const POUpload = () => {
           product_name: product.product_name,
           quantity: product.quantity,
           unit_price: product.unit_price,
-          subtotal: product.amount
+          subtotal: product.amount  // フロントエンド側はamountを使用
         })),
         
         // 以下のフィールドはPOテーブルには保存されないが、別テーブルに保存される
         // UI表示はしないがバックエンドに送信
-        shipment_arrangement: poData.shipment_arrangement,
-        po_acquisition_date: poData.po_acquisition_date,
-        organization: poData.organization,
-        invoice_number: poData.invoice_number,
-        payment_status: poData.payment_status,
-        booking_number: poData.booking_number,
-        memo: poData.memo,
+        shipment_arrangement: poData.shipment_arrangement || "手配前",
+        po_acquisition_date: poData.po_acquisition_date || new Date().toISOString().split('T')[0],
+        organization: poData.organization || "",
+        invoice_number: poData.invoice_number || "",
+        payment_status: poData.payment_status || "",
+        booking_number: poData.booking_number || "",
+        memo: poData.memo || "",
         
         // OCR生データ
-        raw_text: poData.ocr_raw_text
+        raw_text: poData.ocr_raw_text || ""
       };
       
       console.log('送信するデータ:', requestData);
@@ -621,6 +621,10 @@ const POUpload = () => {
       
       if (response.data && response.data.success) {
         console.log('登録成功、完了ダイアログを表示します');
+        setShowCompletedDialog(true);
+      } else if (response.data && response.data.id) {
+        // IDが返ってきたら成功とみなす
+        console.log('登録成功（IDあり）、完了ダイアログを表示します');
         setShowCompletedDialog(true);
       } else {
         console.error('レスポンスにsuccessフラグがありません:', response.data);
