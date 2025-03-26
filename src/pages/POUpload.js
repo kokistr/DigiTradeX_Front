@@ -588,7 +588,7 @@ const POUpload = () => {
         destination: poData.destination,
         
         // 製品情報も変換
-        order_items: poData.products.map(product => ({
+        products: poData.products.map(product => ({
           product_name: product.product_name,
           quantity: product.quantity,
           unit_price: product.unit_price,
