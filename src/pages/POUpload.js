@@ -17,7 +17,7 @@ const POUpload = () => {
     customer_name: '',
     po_number: '',
     currency: '',  
-    total_amount: '0.00',
+    total_amount: 0,
     payment_terms: '',
     shipping_terms: '',
     destination: '',
@@ -27,9 +27,9 @@ const POUpload = () => {
     products: [
       {
         product_name: '',
-        quantity: '',
-        unit_price: '',
-        amount: ''
+        quantity: 0,
+        unit_price: 0,
+        amount: 0
       }
     ],
 
@@ -39,6 +39,7 @@ const POUpload = () => {
     organization: '',
     invoice_number: '',
     payment_status: '',
+    booking_number: '',
     memo: '',
 
     // OCR結果用フィールド
@@ -60,7 +61,7 @@ const POUpload = () => {
       
       setPoData(prevData => ({
         ...prevData,
-        total_amount: total.toFixed(2)
+        total_amount: total
       }));
     }
   }, [poData.products, manualTotalEdit]);
@@ -70,7 +71,7 @@ const POUpload = () => {
     setManualTotalEdit(true); // 手動編集モードをオン
     setPoData(prevData => ({
       ...prevData,
-      total_amount: e.target.value
+      total_amount: parseFloat(e.target.value) || 0
     }));
   };
 
@@ -159,21 +160,21 @@ const POUpload = () => {
               products: [
                 {
                   product_name: 'Product B',
-                  quantity: '5000',
-                  unit_price: '2.7',
-                  amount: '13500'
+                  quantity: 5000,
+                  unit_price: 2.7,
+                  amount: 13500
                 },
                 {
                   product_name: 'Product C',
-                  quantity: '4000',
-                  unit_price: '3.4',
-                  amount: '13600'
+                  quantity: 4000,
+                  unit_price: 3.4,
+                  amount: 13600
                 },
                 {
                   product_name: 'Product D',
-                  quantity: '3000',
-                  unit_price: '3.05',
-                  amount: '9150'
+                  quantity: 3000,
+                  unit_price: 3.05,
+                  amount: 9150
                 }
               ],
               organization: 'サンプル組織',
@@ -185,7 +186,7 @@ const POUpload = () => {
               ...poData,
               ...mockData,
               // 合計金額は自動計算
-              total_amount: (13500 + 13600 + 9150).toString()
+              total_amount: 13500 + 13600 + 9150
             });
             setIsProcessing(false);
             setViewMode('summary');
@@ -347,42 +348,34 @@ const POUpload = () => {
           // 標準的な製品配列形式
           products = extractedData.products.map(product => ({
             product_name: product.product_name || product.name || product.productName || product.description || '',
-            quantity: product.quantity || product.qty || '',
-            unit_price: product.unit_price || product.unitPrice || product.price || '',
-            amount: product.amount || product.subtotal || (
-              product.quantity && product.unit_price 
-                ? (parseFloat(product.quantity) * parseFloat(product.unit_price)).toString()
-                : ''
-            )
+            quantity: parseInt(product.quantity || product.qty, 10) || 0,
+            unit_price: parseFloat(product.unit_price || product.unitPrice || product.price) || 0,
+            amount: parseFloat(product.amount || product.subtotal) || 0
           }));
         } else if (Array.isArray(extractedData.items) && extractedData.items.length > 0) {
           // 代替の製品配列形式
           products = extractedData.items.map(item => ({
             product_name: item.product_name || item.name || item.productName || item.description || '',
-            quantity: item.quantity || item.qty || '',
-            unit_price: item.unit_price || item.unitPrice || item.price || '',
-            amount: item.amount || item.subtotal || (
-              item.quantity && item.unit_price 
-                ? (parseFloat(item.quantity) * parseFloat(item.unit_price)).toString()
-                : ''
-            )
+            quantity: parseInt(item.quantity || item.qty, 10) || 0,
+            unit_price: parseFloat(item.unit_price || item.unitPrice || item.price) || 0,
+            amount: parseFloat(item.amount || item.subtotal) || 0
           }));
         } else {
           // 製品情報が構造化されていない場合のデフォルト
           products = [{
             product_name: extractedData.product_name || extractedData.productName || extractedData.name || '',
-            quantity: extractedData.quantity || '',
-            unit_price: extractedData.unit_price || extractedData.unitPrice || '',
-            amount: extractedData.amount || extractedData.subtotal || ''
+            quantity: parseInt(extractedData.quantity, 10) || 0,
+            unit_price: parseFloat(extractedData.unit_price || extractedData.unitPrice) || 0,
+            amount: parseFloat(extractedData.amount || extractedData.subtotal) || 0,
           }];
         }
         
         // 金額が空の場合、数量と単価から計算
         products = products.map(product => {
           if (!product.amount && product.quantity && product.unit_price) {
-            const quantity = parseFloat(product.quantity) || 0;
-            const unitPrice = parseFloat(product.unit_price) || 0;
-            product.amount = (quantity * unitPrice).toString();
+            const quantity = product.quantity;
+            const unitPrice = product.unit_price;
+            product.amount = quantity * unitPrice;
           }
           return product;
         });
@@ -406,6 +399,7 @@ const POUpload = () => {
           organization: extractedData.organization || '',
           invoice_number: extractedData.invoice_number || extractedData.invoiceNumber || extractedData.invoice || '',
           payment_status: extractedData.payment_status || extractedData.paymentStatus || '',
+          booking_number: extractedData.booking_number || '',
           
           // OCR生データ
           ocr_raw_text: JSON.stringify(extractedData)
@@ -467,9 +461,9 @@ const POUpload = () => {
         ...prevData.products,
         {
           product_name: '',
-          quantity: '',
-          unit_price: '',
-          amount: ''
+          quantity: 0,
+          unit_price: 0,
+          amount: 0
         }
       ]
     }));
@@ -498,14 +492,14 @@ const POUpload = () => {
       const updatedProducts = [...prevData.products];
       updatedProducts[index] = {
         ...updatedProducts[index],
-        [field]: value
+        [field]: field === 'quantity' ? parseInt(value, 10) || 0 : parseFloat(value) || 0
       };
       
       // 数量または単価が変更された場合、金額を自動計算
       if (field === 'quantity' || field === 'unit_price') {
-        const quantity = field === 'quantity' ? parseFloat(value) || 0 : parseFloat(updatedProducts[index].quantity) || 0;
-        const unitPrice = field === 'unit_price' ? parseFloat(value) || 0 : parseFloat(updatedProducts[index].unit_price) || 0;
-        updatedProducts[index].amount = (quantity * unitPrice).toString();
+        const quantity = updatedProducts[index].quantity;
+        const unitPrice = updatedProducts[index].unit_price;
+        updatedProducts[index].amount = quantity * unitPrice;
       }
       
       return {
@@ -533,7 +527,7 @@ const POUpload = () => {
       customer_name: '',
       po_number: '',
       currency: 'USD',
-      total_amount: '0.00',
+      total_amount: 0,
       payment_terms: '',
       shipping_terms: '',
       destination: '',
@@ -543,9 +537,9 @@ const POUpload = () => {
       products: [
         {
           product_name: '',
-          quantity: '',
-          unit_price: '',
-          amount: ''
+          quantity: 0,
+          unit_price: 0,
+          amount: 0
         }
       ],
 
@@ -555,6 +549,7 @@ const POUpload = () => {
       organization: '',
       invoice_number: '',
       payment_status: '',
+      booking_number: '',
       memo: '',
 
       // OCR結果用フィールド
@@ -583,21 +578,21 @@ const POUpload = () => {
       // バックエンドに送信するデータを準備
       // APIの期待する形式にデータを変換
       const requestData = {
-        // バックエンドの期待するフィールド名に変換
-        customer: poData.customer_name,
-        poNumber: poData.po_number,
+        // モデルのフィールド名に合わせる
+        customer_name: poData.customer_name,
+        po_number: poData.po_number,
         currency: poData.currency,
-        totalAmount: poData.total_amount,
-        paymentTerms: poData.payment_terms,
-        terms: poData.shipping_terms,
+        total_amount: poData.total_amount,
+        payment_terms: poData.payment_terms,
+        shipping_terms: poData.shipping_terms,
         destination: poData.destination,
         
         // 製品情報も変換
-        products: poData.products.map(product => ({
-          name: product.product_name,
+        order_items: poData.products.map(product => ({
+          product_name: product.product_name,
           quantity: product.quantity,
-          unitPrice: product.unit_price,
-          amount: product.amount
+          unit_price: product.unit_price,
+          subtotal: product.amount
         })),
         
         // 以下のフィールドはPOテーブルには保存されないが、別テーブルに保存される
@@ -607,10 +602,11 @@ const POUpload = () => {
         organization: poData.organization,
         invoice_number: poData.invoice_number,
         payment_status: poData.payment_status,
+        booking_number: poData.booking_number,
         memo: poData.memo,
         
         // OCR生データ
-        ocr_raw_text: poData.ocr_raw_text
+        raw_text: poData.ocr_raw_text
       };
       
       console.log('送信するデータ:', requestData);
@@ -804,7 +800,7 @@ const POUpload = () => {
                      <input 
                        type="text" 
                        className="info-input" 
-                       value={product.quantity}
+                       value={product.quantity.toString()} // 数値型を文字列に変換
                        onChange={(e) => handleProductChange(index, 'quantity', e.target.value)}
                        disabled={viewMode === 'processing'}
                      />
@@ -814,7 +810,7 @@ const POUpload = () => {
                      <input 
                        type="text" 
                        className="info-input" 
-                       value={product.unit_price}
+                       value={product.unit_price.toString()} // 数値型を文字列に変換
                        onChange={(e) => handleProductChange(index, 'unit_price', e.target.value)}
                        disabled={viewMode === 'processing'}
                      />
@@ -824,7 +820,7 @@ const POUpload = () => {
                      <input 
                        type="text" 
                        className="info-input" 
-                       value={product.amount}
+                       value={product.amount.toString()} // 数値型を文字列に変換
                        onChange={(e) => handleProductChange(index, 'amount', e.target.value)}
                        disabled={viewMode === 'processing'}
                      />
@@ -838,7 +834,7 @@ const POUpload = () => {
                <input 
                  type="text" 
                  className="info-input total-amount" 
-                 value={poData.total_amount}
+                 value={poData.total_amount.toString()} // 数値型を文字列に変換
                  onChange={handleTotalAmountChange}
                  disabled={viewMode === 'processing'}
                />
@@ -998,6 +994,6 @@ const POUpload = () => {
      )}
    </div>
  );
- };
+};
 
- export default POUpload;
+export default POUpload;
