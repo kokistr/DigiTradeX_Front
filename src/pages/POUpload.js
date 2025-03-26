@@ -42,8 +42,8 @@ const POUpload = () => {
     booking_number: '',
     memo: '',
 
-    // OCR結果用フィールド
-    ocr_raw_text: ''
+    // OCR結果用フィールド（データベース上はraw_text）
+    raw_text: ''
   });
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [showCompletedDialog, setShowCompletedDialog] = useState(false);
@@ -258,6 +258,7 @@ const POUpload = () => {
       
       const response = await axios.get(`${API_URL}/api/ocr/status/${ocrId}`);
       console.log('ステータス結果:', response.data);
+      console.log('ステータス結果 (詳細):', JSON.stringify(response.data, null, 2));
       
       if (response.data.status === 'completed') {
         // 処理完了 - 結果を取得
@@ -276,9 +277,8 @@ const POUpload = () => {
     }
   };
   
-  
   // OCR結果データの取得
-  const fetchOCRData = async (ocrId) => {
+  const fetchOCRResults = async (ocrId) => {
     try {
       console.log('Fetching OCR data for ID:', ocrId);
       
@@ -290,6 +290,7 @@ const POUpload = () => {
       
       // デバッグ用ログを追加
       console.log('OCR Data response:', response.data);
+      console.log('OCR Data response (詳細):', JSON.stringify(response.data, null, 2));
       
       // データパスの検出と抽出（APIの応答形式が変わる可能性に対応）
       let extractedData = null;
@@ -373,8 +374,8 @@ const POUpload = () => {
           payment_status: extractedData.payment_status || extractedData.paymentStatus || '',
           booking_number: extractedData.booking_number || '',
           
-          // OCR生データ
-          ocr_raw_text: JSON.stringify(extractedData)
+          // OCR生データ - データベースのraw_textに対応
+          raw_text: JSON.stringify(extractedData)
         };
         
         // 合計金額は製品の金額合計から計算（useEffectで自動計算）
@@ -464,7 +465,8 @@ const POUpload = () => {
       const updatedProducts = [...prevData.products];
       updatedProducts[index] = {
         ...updatedProducts[index],
-        [field]: field === 'quantity' ? parseInt(value, 10) || 0 : parseFloat(value) || 0
+        [field]: field === 'quantity' ? parseInt(value, 10) || 0 : 
+                field === 'product_name' ? value : parseFloat(value) || 0
       };
       
       // 数量または単価が変更された場合、金額を自動計算
@@ -525,7 +527,7 @@ const POUpload = () => {
       memo: '',
 
       // OCR結果用フィールド
-      ocr_raw_text: ''
+      raw_text: ''
     });
     setErrorMessage('');
     setSuccessMessage('');
@@ -559,12 +561,12 @@ const POUpload = () => {
         shipping_terms: poData.shipping_terms,
         destination: poData.destination,
         
-        // 製品情報も変換
+        // 製品情報も変換 - 重要: products配列を使用（バックエンドはproductsを期待）
         products: poData.products.map(product => ({
           product_name: product.product_name,
           quantity: product.quantity,
           unit_price: product.unit_price,
-          subtotal: product.amount  // フロントエンド側はamountを使用
+          subtotal: product.amount  // フロントエンド側はamountを使用、バックエンドはsubtotalを期待
         })),
         
         // 以下のフィールドはPOテーブルには保存されないが、別テーブルに保存される
@@ -577,8 +579,8 @@ const POUpload = () => {
         booking_number: poData.booking_number || "",
         memo: poData.memo || "",
         
-        // OCR生データ
-        raw_text: poData.ocr_raw_text || ""
+        // OCR生データ - データベースのraw_textに対応
+        raw_text: poData.raw_text || ""
       };
       
       console.log('送信するデータ:', requestData);
@@ -916,7 +918,7 @@ const POUpload = () => {
          </div>
        </div>
      </div>
-
+  
      {/* 登録確認ダイアログ - デザイン変更 */}
      {showConfirmDialog && (
        <div className="overlay">
@@ -969,7 +971,5 @@ const POUpload = () => {
        </div>
      )}
    </div>
- );
-};
-
-export default POUpload;
+  );
+     
