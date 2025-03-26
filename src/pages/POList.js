@@ -86,13 +86,13 @@ const POList = () => {
   };
   
   // 出荷手配変更ハンドラ
-  const handleStatusChange = async (id, newStatus) => {
+  const handleStatusChange = async (po_id, newStatus) => {
     try {
       
-      console.log(`出荷手配更新: ID=${id}, 新出荷手配=${newStatus}`);
+      console.log(`出荷手配更新: ID=${po_id}, 新出荷手配=${newStatus}`);
       
       await axios.patch(
-        `${API_URL}/api/po/${id}/status`, 
+        `${API_URL}/api/po/${po_id}/status`, 
         { status: newStatus }, 
         {
           headers: {
@@ -103,13 +103,13 @@ const POList = () => {
       
       // 状態を更新
       const updatedList = poList.map(po => 
-        po.id === id ? { ...po, status: newStatus } : po
+        po.po_id === po_id ? { ...po, status: newStatus } : po
       );
       setPOList(updatedList);
       
       // 元のデータも更新
       setOriginalData(originalData.map(po => 
-        po.id === id ? { ...po, status: newStatus } : po
+        po.po_id === po_id ? { ...po, status: newStatus } : po
       ));
     } catch (error) {
       console.error('Status update error:', error);
@@ -118,10 +118,10 @@ const POList = () => {
   };
   
   // 行の展開・折りたたみを切り替え
-  const toggleRowExpand = (id) => {
+  const toggleRowExpand = (po_id) => {
     setExpandedRows(prev => ({
       ...prev,
-      [id]: !prev[id]
+      [po_id]: !prev[po_id]
     }));
   };
   
@@ -162,13 +162,13 @@ const POList = () => {
       
       // PONoフィルター
       if (filters.po_number && 
-          !String(po.poNumber || '').toLowerCase().includes(filters.po_number.toLowerCase())) {
+          !String(po.po_number || '').toLowerCase().includes(filters.po_number.toLowerCase())) {
         return false;
       }
       
       // 顧客フィルター
       if (filters.customer_name && 
-          !String(po.customer || '').toLowerCase().includes(filters.customer_name.toLowerCase())) {
+          !String(po.customer_name || '').toLowerCase().includes(filters.customer_name.toLowerCase())) {
         return false;
       }
       
@@ -194,11 +194,11 @@ const POList = () => {
   };
   
   // メモ更新ハンドラ
-  const handleMemoUpdate = async (id, memo) => {
+  const handleMemoUpdate = async (po_id, memo) => {
     try {
       
       await axios.patch(
-        `${API_URL}/api/po/${id}/memo`, 
+        `${API_URL}/api/po/${po_id}/memo`, 
         { memo }, 
         {
           headers: {
@@ -209,13 +209,13 @@ const POList = () => {
       
       // 状態を更新
       const updatedList = poList.map(po => 
-        po.id === id ? { ...po, memo } : po
+        po.po_id === po_id ? { ...po, memo } : po
       );
       setPOList(updatedList);
       
       // 元のデータも更新
       setOriginalData(originalData.map(po => 
-        po.id === id ? { ...po, memo } : po
+        po.po_id === po_id ? { ...po, memo } : po
       ));
     } catch (error) {
       console.error('Memo update error:', error);
@@ -237,10 +237,10 @@ const POList = () => {
   const totalPages = Math.ceil(poList.length / itemsPerPage);
   
   // チェックボックスの状態更新
-  const handleCheckboxChange = (id) => {
+  const handleCheckboxChange = (po_id) => {
     setSelectedItems(prev => ({
       ...prev,
-      [id]: !prev[id]
+      [po_id]: !prev[po_id]
     }));
   };
   
@@ -271,7 +271,7 @@ const POList = () => {
       // 選択されたIDのリストを作成
       const idsToDelete = Object.entries(selectedItems)
         .filter(([_, isSelected]) => isSelected)
-        .map(([id, _]) => id);
+        .map(([po_id, _]) => po_id);
       
       console.log('削除するPO:', idsToDelete);
       
@@ -280,7 +280,7 @@ const POList = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        data: { ids: idsToDelete }
+        data: { po_ids: idsToDelete }
       });
       
       // データを再取得して反映
@@ -397,7 +397,8 @@ const POList = () => {
         <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
           <div className="flex items-center text-red-600 mb-4">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77
+1.333.192 3 1.732 3z" />
             </svg>
             <h3 className="text-lg font-bold">削除の確認</h3>
           </div>
@@ -598,31 +599,31 @@ const POList = () => {
               </thead>
               <tbody>
                 {getCurrentItems().map((po) => (
-                  <React.Fragment key={po.id}>
+                  <React.Fragment key={po.po_id}>
                     <tr className={getStatusClass(po.status)}>
                       <td className="border p-2">
                         <div className="flex items-center">
                           <input
-                            id={`checkbox-${po.id}`}
+                            id={`checkbox-${po.po_id}`}
                             type="checkbox"
-                            checked={!!selectedItems[po.id]}
-                            onChange={() => handleCheckboxChange(po.id)}
+                            checked={!!selectedItems[po.po_id]}
+                            onChange={() => handleCheckboxChange(po.po_id)}
                             className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
                           />
                         </div>
                       </td>
                       <td className="border p-2">
                         <button 
-                          onClick={() => toggleRowExpand(po.id)} 
+                          onClick={() => toggleRowExpand(po.po_id)} 
                           className="text-blue-600 hover:text-blue-800"
                         >
-                          {expandedRows[po.id] ? '▼' : '▶'}
+                          {expandedRows[po.po_id] ? '▼' : '▶'}
                         </button>
                       </td>
                       <td className="border p-2">
                         <select
                           value={po.status || '手配前'}
-                          onChange={(e) => handleStatusChange(po.id, e.target.value)}
+                          onChange={(e) => handleStatusChange(po.po_id, e.target.value)}
                           className="border rounded p-1 w-full"
                         >
                           <option value="手配前">手配前</option>
@@ -633,48 +634,48 @@ const POList = () => {
                       </td>
                       <td className="border p-2">{po.manager || ""}</td>
                       <td className="border p-2">{po.organization || ""}</td>
-                      <td className="border p-2">{po.invoiceNumber || ""}</td>
-                      <td className="border p-2">{po.poNumber || ""}</td>
-                      <td className="border p-2">{po.customer || ""}</td>
-                      <td className="border p-2">{po.cutOffDate || ""}</td>
+                      <td className="border p-2">{po.invoice_number || ""}</td>
+                      <td className="border p-2">{po.po_number || ""}</td>
+                      <td className="border p-2">{po.customer_name || ""}</td>
+                      <td className="border p-2">{po.cut_off_date || ""}</td>
                       <td className="border p-2">{po.etd || ""}</td>
                       <td className="border p-2">{po.destination || ""}</td>
                     </tr>
-                    {expandedRows[po.id] && (
+                    {expandedRows[po.po_id] && (
                       <tr className={`${getStatusClass(po.status)} text-xs`}>
                         <td colSpan="11" className="border p-2">
                           <div className="grid grid-cols-4 gap-2">
                             <div className="mb-2">
                               <div className="font-bold">取得日:</div>
-                              <div>{po.acquisitionDate || ""}</div>
+                              <div>{po.po_acquisition_date || ""}</div>
                             </div>
                             <div className="mb-2">
                               <div className="font-bold">伝票:</div>
-                              <div>{po.invoice || ""}</div>
+                              <div>{po.invoice_number || ""}</div>
                             </div>
                             <div className="mb-2">
                               <div className="font-bold">入金:</div>
-                              <div>{po.payment || ""}</div>
+                              <div>{po.payment_status || ""}</div>
                             </div>
                             <div className="mb-2">
                               <div className="font-bold">BKG:</div>
-                              <div>{po.booking || ""}</div>
+                              <div>{po.booking_number || ""}</div>
                             </div>
                             <div className="mb-2">
                               <div className="font-bold">商品名称:</div>
-                              <div>{po.productName || ""}</div>
+                              <div>{po.order_items?.[0]?.product_name || ""}</div>
                             </div>
                             <div className="mb-2">
                               <div className="font-bold">数量(kg):</div>
-                              <div>{po.quantity || ""}</div>
+                              <div>{po.order_items?.[0]?.quantity?.toLocaleString() || ""}</div>
                             </div>
                             <div className="mb-2">
                               <div className="font-bold">単価:</div>
-                              <div>{po.unitPrice || ""}</div>
+                              <div>{po.order_items?.[0]?.unit_price?.toLocaleString() || ""}</div>
                             </div>
                             <div className="mb-2">
                               <div className="font-bold">金額:</div>
-                              <div>{po.amount || ""}</div>
+                              <div>{po.order_items?.[0]?.subtotal?.toLocaleString() || ""}</div>
                             </div>
                             <div className="mb-2">
                               <div className="font-bold">通貨:</div>
@@ -682,23 +683,23 @@ const POList = () => {
                             </div>
                             <div className="mb-2">
                               <div className="font-bold">支払条件:</div>
-                              <div>{po.paymentTerms || ""}</div>
+                              <div>{po.payment_terms || ""}</div>
                             </div>
                             <div className="mb-2">
                               <div className="font-bold">ターム:</div>
-                              <div>{po.terms || ""}</div>
+                              <div>{po.shipping_terms || ""}</div>
                             </div>
                             <div className="mb-2">
                               <div className="font-bold">経由地:</div>
-                              <div>{po.transitPoint || ""}</div>
+                              <div>{po.shipping_schedules?.[0]?.transit_point || ""}</div>
                             </div>
                             <div className="mb-2">
                               <div className="font-bold">ETA:</div>
-                              <div>{po.eta || ""}</div>
+                              <div>{po.shipping_schedules?.[0]?.eta || ""}</div>
                             </div>
                             <div className="mb-2">
                               <div className="font-bold">BKG No.:</div>
-                              <div>{po.bookingNumber || ""}</div>
+                              <div>{po.shipping_schedules?.[0]?.booking_number || ""}</div>
                             </div>
                             <div className="mb-2">
                               <div className="font-bold">船名:</div>
