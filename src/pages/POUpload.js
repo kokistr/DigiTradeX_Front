@@ -972,3 +972,6 @@ const POUpload = () => {
      )}
    </div>
   );
+};
+
+export default POUpload;
