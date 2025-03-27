@@ -891,29 +891,30 @@ const POUpload = () => {
                  <div className="spinner"></div>
                </div>
              )}
-
-             
-               //<div className="preview-area">
-                 //{uploadedFile.type.includes('image') ? (
-                   //<img 
-                     //src={URL.createObjectURL(uploadedFile)} 
-                     //alt="Uploaded PO" 
-                     //className="preview-image"
-                   ///>
-                 //) : (
-                   //<div className="preview-pdf">
-                     //<p className="preview-filename">ファイル名: {uploadedFile.name}</p>
-                     //<object
-                       //data={URL.createObjectURL(uploadedFile)}
-                       //type="application/pdf"
-                       //className="pdf-object"
-                     //>
-                       //<p>PDFを表示できません。<a href={URL.createObjectURL(uploadedFile)} target="_blank" rel="noopener noreferrer">ここをクリック</a>して新しいタブで開いてください。</p>
-                     //</object>
-                   //</div>
-                 //)}
-               //</div>
-             //)}
+{/*
+             {viewMode === 'summary' && uploadedFile && (
+               <div className="preview-area">
+                 {uploadedFile.type.includes('image') ? (
+                   <img 
+                     src={URL.createObjectURL(uploadedFile)} 
+                     alt="Uploaded PO" 
+                     className="preview-image"
+                   />
+                 ) : (
+                   <div className="preview-pdf">
+                     <p className="preview-filename">ファイル名: {uploadedFile.name}</p>
+                     <object
+                       data={URL.createObjectURL(uploadedFile)}
+                       type="application/pdf"
+                       className="pdf-object"
+                     >
+                       <p>PDFを表示できません。<a href={URL.createObjectURL(uploadedFile)} target="_blank" rel="noopener noreferrer">ここをクリック</a>して新しいタブで開いてください。</p>
+                     </object>
+                   </div>
+                 )}
+               </div>
+             )}
+*/}
 
             {viewMode === 'summary' && uploadedFile && (
               <div className="preview-area">
