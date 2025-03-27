@@ -892,7 +892,7 @@ const POUpload = () => {
                </div>
              )}
 
-             //{viewMode === 'summary' && uploadedFile && (
+             
                //<div className="preview-area">
                  //{uploadedFile.type.includes('image') ? (
                    //<img 
