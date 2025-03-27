@@ -891,7 +891,7 @@ const POUpload = () => {
                  <div className="spinner"></div>
                </div>
              )}
-           
+
              //{viewMode === 'summary' && uploadedFile && (
                //<div className="preview-area">
                  //{uploadedFile.type.includes('image') ? (
@@ -914,6 +914,7 @@ const POUpload = () => {
                  //)}
                //</div>
              //)}
+
             {viewMode === 'summary' && uploadedFile && (
               <div className="preview-area">
                 {uploadedFile.type.includes('image') ? (
